@@ -31,4 +31,32 @@ extension Double {
     var percentRepresentationString: String {
         formattedNumberString + "%"
     }
+    
+    var formattedWithAbbreviations: String {
+        let num = abs(Double(self))
+        let sign = (self < 0) ? "-" : ""
+
+        switch num {
+        case 1_000_000_000_000...:
+            let formatted = num / 1_000_000_000_000
+            let stringFormatted = formatted.formattedNumberString
+            return "\(sign)\(stringFormatted)Tr"
+        case 1_000_000_000...:
+            let formatted = num / 1_000_000_000
+            let stringFormatted = formatted.formattedNumberString
+            return "\(sign)\(stringFormatted)Bn"
+        case 1_000_000...:
+            let formatted = num / 1_000_000
+            let stringFormatted = formatted.formattedNumberString
+            return "\(sign)\(stringFormatted)M"
+        case 1_000...:
+            let formatted = num / 1_000
+            let stringFormatted = formatted.formattedNumberString
+            return "\(sign)\(stringFormatted)K"
+        case 0...:
+            return self.formattedNumberString
+        default:
+            return "\(sign)\(self)"
+        }
+    }
 }

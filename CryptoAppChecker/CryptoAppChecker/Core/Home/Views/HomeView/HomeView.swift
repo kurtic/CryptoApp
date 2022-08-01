@@ -2,7 +2,7 @@
 //  HomeView.swift
 //  CryptoAppChecker
 //
-//  Created by Diachenko Ihor on 23.07.2022.
+//  Created by Diachenko Ihor on 23.06.2022.
 //
 
 import SwiftUI
@@ -10,24 +10,34 @@ import SwiftUI
 struct HomeView: View {
     
     @EnvironmentObject private var vm: HomeVM
-    @State private var showPortfolio: Bool = false
+    @State private var showPortfolio = false
+    @State private var showPortfolioView = false
     
     var body: some View {
         ZStack {
             Color.theme.background
                 .ignoresSafeArea()
+                .sheet(isPresented: $showPortfolioView, content: {
+                    PortfolioView()
+                        .environmentObject(vm)
+                })
             
             VStack {
                 header
+                HomeStatesView(showPortfolio: $showPortfolio)
+                SearchBarView(searchText: $vm.searchText)
                 titlesRow
                 
                 if !showPortfolio {
                     coinsList
                         .transition(.move(edge: .leading))
-                } else {
-                    portfolioCoinsList.transition(.move(edge: .trailing))
                 }
                 
+                if showPortfolio {
+                    portfolioCoinsList
+                        .transition(.move(edge: .trailing))
+                }
+        
                 Spacer(minLength: 0)
             }
         }
@@ -39,11 +49,13 @@ extension HomeView {
         HStack {
             if showPortfolio {
                 CircleButtonView(iconName: "plus")
+                    .onTapGesture {
+                        showPortfolioView.toggle()
+                    }
                     .background ( CircleButtonAnimationView(animate: $showPortfolio))
             } else {
                 CircleButtonView(iconName: "plus").hidden()
             }
-                                
             Spacer()
             Text(showPortfolio ? "Portfolio" : "Live Prices")
                 .animation(.none)
@@ -77,7 +89,7 @@ extension HomeView {
     
     private var portfolioCoinsList: some View {
         List {
-            ForEach(vm.allCoins) { coin in
+            ForEach(vm.portfolioCoins) { coin in
                 CoinRowView(coin: coin, showHoldingsColumn: true)
                     .listRowInsets(EdgeInsets(top: 10,
                                               leading: 0,
